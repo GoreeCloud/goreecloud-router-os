@@ -1,0 +1,133 @@
+schema_version: "0.2"
+
+component:
+  type: service
+  id: goreecloud-router-os
+  product_name: GoreeCloud Router OS
+  repository: GoreeCloud/goreecloud-router-os
+
+lifecycle: development
+version: "0.0.1-m0"
+
+supported_platforms:
+  - linux-x86_64-virtual-development
+
+api:
+  versions: []
+  endpoints: []
+
+platform_systems:
+  manager:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - README.md
+    notes: GoreeCloud Manager registration, administrative integration, and runtime acceptance are not established.
+  privacy_shield:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - PRIVACY POLICY.md
+      - SECURITY.md
+    notes: The prototype is local-only and privacy-minimized, but accepted Privacy Shield authorization and runtime privacy evidence are not established.
+  wardveil_security:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - SECURITY.md
+      - tests/test_routeros_m0.py
+    notes: Prototype validation and rollback invariants exist, but accepted Wardveil Security integration and production protection evidence are not established.
+  everkeep:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - prototype/routeros_m0/transaction.py
+      - tests/test_routeros_m0.py
+    notes: In-memory known-good rollback is implemented only as a Milestone 0 proof; durable Everkeep snapshots, restore, migration, and recovery acceptance are not established.
+  glaze_ui:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - README.md
+    notes: A Glaze UI administration surface is specified for Reference Build 0.1 but no accepted UI implementation exists in this repository.
+  mesh:
+    result: applicable-blocked
+    version: null
+    evidence: []
+    notes: GoreeCloud Mesh registration, capability publication, and runtime acceptance are not established.
+    capabilities: []
+    dependencies: []
+    published_events: []
+    consumed_events: []
+  identity:
+    result: applicable-blocked
+    version: null
+    evidence:
+      - README.md
+    notes: A local authenticated management API is planned, but accepted GoreeCloud Identity integration is not established.
+
+health:
+  health_endpoint: null
+  readiness_endpoint: null
+
+continuity:
+  backup:
+    required: true
+    requirements:
+      - Define durable Router OS configuration snapshot scope and retention under Everkeep and Privacy Shield authority.
+      - Preserve the previous known-good configuration before high-risk apply operations.
+  restore:
+    required: true
+    requirements:
+      - Validate configuration compatibility and schema before restore.
+      - Verify runtime state after restore and fail closed when verification cannot prove success.
+  export:
+    required: true
+    requirements:
+      - Define a versioned, secret-safe configuration export format before user-facing export is implemented.
+  portability:
+    required: true
+    requirements:
+      - Define hardware/interface remapping and compatibility rules before cross-device restore is claimed.
+
+external_dependencies:
+  - name: Linux networking stack
+    purpose: Future kernel routing, filtering, interfaces, and traffic-control primitives.
+    required: true
+    version_constraint: null
+
+compatibility:
+  platform_contract: "0.2"
+  glaze_ui_required: null
+  requires:
+    - goreecloud-platform-contract==0.2
+  provides:
+    - goreecloud-router-os-config/0.1-prototype
+
+evidence:
+  acceptance_tests:
+    - tests/test_routeros_m0.py
+  release: []
+
+conformance:
+  status: nonconformant
+  validated_at: null
+  evidence:
+    - README.md
+    - SPECIFICATIONS.md
+    - SECURITY.md
+    - PRIVACY POLICY.md
+    - prototype/routeros_m0/validator.py
+    - prototype/routeros_m0/compiler.py
+    - prototype/routeros_m0/transaction.py
+    - tests/test_routeros_m0.py
+  blockers:
+    - Reference Build 0.1 privileged Linux networking backends are not implemented or accepted.
+    - Local authenticated management API is not implemented or accepted.
+    - Glaze UI administration surface is not implemented or accepted.
+    - Privacy Shield integration and runtime acceptance are not established.
+    - Wardveil Security integration and runtime acceptance are not established.
+    - Everkeep durable recovery integration and acceptance are not established.
+    - GoreeCloud Mesh, Manager, and Identity platform integration acceptance are not established.
+    - Virtual-machine routing, firewall, NAT, DHCP, rollback, recovery, and management-safety acceptance is outstanding.
+    - Production signing, update, release, hardware qualification, and deployment acceptance are outstanding.

@@ -1,0 +1,9 @@
+[project]
+name = "goreecloud-router-os-m0-prototype"
+version = "0.0.1"
+description = "Unprivileged Milestone 0 configuration and transaction proof for GoreeCloud Router OS"
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.setuptools]
+packages = []

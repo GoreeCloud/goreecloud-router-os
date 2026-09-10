@@ -1,0 +1,130 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://goreecloud.com/schemas/router-os/reference-build-0.1.json",
+  "title": "GoreeCloud Router OS Reference Build 0.1 Prototype Configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "profile",
+    "interfaces",
+    "ipv4_forwarding",
+    "firewall",
+    "management"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "0.1"
+    },
+    "profile": {
+      "const": "reference-build-0.1"
+    },
+    "interfaces": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "role",
+          "mode"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "role": {
+            "enum": [
+              "wan",
+              "lan"
+            ]
+          },
+          "mode": {
+            "enum": [
+              "dhcp",
+              "static"
+            ]
+          },
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "dhcp": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "start": {
+                "type": "string"
+              },
+              "end": {
+                "type": "string"
+              },
+              "lease_seconds": {
+                "type": "integer",
+                "minimum": 60,
+                "maximum": 604800
+              }
+            },
+            "required": [
+              "start",
+              "end",
+              "lease_seconds"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    },
+    "ipv4_forwarding": {
+      "type": "boolean"
+    },
+    "firewall": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "default_input",
+        "default_forward",
+        "allow_established",
+        "allow_lan_to_wan"
+      ],
+      "properties": {
+        "default_input": {
+          "const": "drop"
+        },
+        "default_forward": {
+          "const": "drop"
+        },
+        "allow_established": {
+          "type": "boolean"
+        },
+        "allow_lan_to_wan": {
+          "type": "boolean"
+        }
+      }
+    },
+    "management": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "bind_role",
+        "authenticated"
+      ],
+      "properties": {
+        "bind_role": {
+          "const": "lan"
+        },
+        "authenticated": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}
