@@ -6,12 +6,15 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 from typing import Any, Mapping
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from prototype.routeros_m0.compiler import compile_plan
 from prototype.routeros_m0.linux_adapter import LinuxNamespaceExecutionAdapter
-
-ROOT = Path(__file__).resolve().parents[1]
 
 
 class SmokeError(RuntimeError):
