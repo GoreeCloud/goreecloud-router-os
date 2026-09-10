@@ -17,9 +17,9 @@ The first executable reference build is intended for a narrow x86-64 virtual-rou
 
 Wi-Fi, multi-WAN, IDS/IPS, dynamic routing, extension installation, high availability, arbitrary consumer-router support, and production remote administration are outside Reference Build 0.1 unless separately approved.
 
-## Current source scope
+## Current product-source scope
 
-The repository currently implements only an **unprivileged architecture prototype**:
+The repository currently implements only an **unprivileged Router OS architecture prototype**:
 
 1. Candidate configuration parsing.
 2. Cross-field validation for interface identity, subnets, management exposure, forwarding intent, and DHCP scope.
@@ -30,9 +30,9 @@ The repository currently implements only an **unprivileged architecture prototyp
 7. In-memory transactional apply, verify, retain, and rollback behavior.
 8. Optional atomic local transaction journaling for prepared/applied/terminal phase transitions.
 9. Fail-closed interrupted-operation reconciliation against exact previous and desired revisions.
-10. Tests that prove the current validation, preview, review/apply, transaction, journal-integrity, and recovery semantics.
+10. Tests that prove the current validation, preview, review/apply, transaction, journal-integrity, recovery, and lab-plan safety semantics.
 
-No prototype action executes `nft`, `ip`, `tc`, `sysctl`, `hostapd`, DHCP daemons, WireGuard, FRRouting, Suricata, or another privileged system command.
+No **product prototype** action executes `nft`, `ip`, `tc`, `sysctl`, `hostapd`, DHCP daemons, WireGuard, FRRouting, Suricata, or another privileged system command. A separate development test harness is described below and must not be confused with the product runtime.
 
 ## State model
 
@@ -51,9 +51,9 @@ The intended lifecycle remains:
 
 `Draft → Validate → Preview → Apply → Verify → Retain or Roll Back`
 
-The Milestone 0 preview now produces bounded semantic change descriptions, an overall risk level, a connectivity-confirmation indicator for high/critical changes, and an approval token derived from the exact previous/desired revision pair and preview content. The reviewed transaction path recomputes that preview immediately before apply and refuses a stale candidate or stale previous state before runtime mutation.
+The Milestone 0 preview produces bounded semantic change descriptions, an overall risk level, a connectivity-confirmation indicator for high/critical changes, and an approval token derived from the exact previous/desired revision pair and preview content. The reviewed transaction path recomputes that preview immediately before apply and refuses a stale candidate or stale previous state before runtime mutation.
 
-Apply, verify, retain, rollback, journaling, and interrupted recovery still operate only against an in-memory adapter. Privileged Linux adapters are future work and require separate safety review and acceptance.
+Apply, verify, retain, rollback, journaling, and interrupted recovery still operate only against an in-memory product adapter. Privileged Linux Router OS adapters are future work and require separate safety review and acceptance.
 
 ## Recovery proof boundary
 
@@ -68,6 +68,14 @@ This behavior proves process-level decision semantics only. It does not establis
 The current preview intentionally summarizes only known fields from the narrow Reference Build 0.1 model. It does not echo raw configuration values or unknown fields into its report, so secret-like extension values are not surfaced by the preview. Its risk levels are development classifications, not Wardveil Security findings or production safety certification.
 
 A high or critical preview merely indicates that the later product should require stronger confirmation/recovery behavior; it does not prove that a real network lockout can already be detected or recovered from.
+
+## Virtual network lab boundary
+
+The repository includes a development-only Reference Build 0.1 Linux network-namespace lab. The initial harness creates three generated namespaces representing upstream, router, and LAN client; connects them with two veth pairs; uses documentation-only WAN test addressing plus the current development LAN subnet; enables IPv4 forwarding inside the router namespace; verifies routed ping connectivity; compares the host default route before and after execution; and verifies namespace teardown.
+
+The lab runs with elevated privileges on an ephemeral GitHub-hosted CI runner because Linux namespace creation requires them. Those privileges belong to the isolated test harness, not the Router OS product runtime. The lab command plan accepts no caller-supplied shell fragments, and all route additions target explicit namespaces rather than the host routing table.
+
+The initial namespace lab is an acceptance substrate only. Its temporary static WAN plumbing does not satisfy the Reference Build 0.1 DHCP-WAN requirement, and it does not implement or verify the planned Router OS privileged execution adapter, nftables firewall/NAT backend, LAN DHCP backend, authenticated management API, management-lockout recovery, or platform-system integrations.
 
 ## Canonical authority
 
