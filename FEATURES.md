@@ -1,6 +1,6 @@
 # GoreeCloud Router OS — Features and Implementation State
 
-## Implemented in the Milestone 0 prototype
+## Implemented in the Milestone 0 configuration/transaction core
 
 - JSON candidate configuration loading.
 - Two-interface Reference Build 0.1 validation.
@@ -23,20 +23,26 @@
 - Explicit refusal to persist defined sensitive configuration fields in the Milestone 0 journal.
 - Interrupted-transaction reconciliation that accepts only exact desired/previous revisions and refuses unknown third states.
 - Preservation of corrupt/ambiguous journal evidence for explicit recovery instead of automatic overwrite.
-- Unit tests for validation, determinism, preview/review consistency, state separation, rollback, journal integrity, interrupted recovery, and virtual-lab plan safety.
 
-## Implemented development test infrastructure
+## Implemented Development test and execution infrastructure
 
 - Reference Build 0.1 Linux network-namespace lab scaffold with upstream, router, and LAN-client namespaces.
 - Two temporary veth links and namespace-local addressing/routing for a routed-connectivity smoke test.
 - Router-namespace-only IPv4-forwarding enablement.
 - Host-default-route before/after comparison and explicit namespace teardown verification.
-- GitHub Actions execution of the isolated namespace smoke test on an ephemeral hosted runner.
+- Bounded `LinuxNamespaceExecutionAdapter` restricted to `gcr-a-<digits>` namespaces and an explicit interface allowlist.
+- Complete adapter-plan preflight before target probes or mutation.
+- Structured-argv static IPv4 LAN address replacement and link-up execution inside the approved namespace.
+- Structured-argv `net.ipv4.ip_forward` execution inside the approved namespace, limited to integer 0/1.
+- Absolute `ip`/`sysctl` tool resolution before privileged execution.
+- Fail-closed refusal of WAN DHCP and unimplemented DHCP, firewall, and management operation kinds.
+- Unit tests proving full-plan refusal before runner activity, target validation, sysctl restrictions, tool-path materialization, and non-root refusal.
+- GitHub Actions smoke tests for both the virtual topology and the isolated namespace adapter on an ephemeral hosted runner.
 
-The virtual lab is test infrastructure, not Router OS runtime functionality. Its temporary static WAN plumbing does not implement the specified DHCP-WAN backend.
+The namespace lab and privileged adapter are Development infrastructure, not a deployable Router OS runtime. The adapter is not wired into product transaction apply/rollback, and the temporary lab WAN plumbing does not implement the specified DHCP-WAN backend.
 
 ## Specified but not implemented
 
 The canonical specification defines production routing, nftables-backed firewalling, NAT, VLANs, device inventory and quarantine, WAN/multi-WAN, Wi-Fi and travel-router functions, GoreeCloud Network/Conduit integration, VPN interoperability, Beacon integration, DHCP/IPv6, SQM, traffic visibility, IDS/IPS, Wardveil Security, Privacy Shield, Everkeep, Glaze UI administration, diagnostics, extensions, API/CLI, secure updates, hardware support, and high availability.
 
-These capabilities remain planned or later-milestone work. The local journal is not Everkeep integration, the preview risk model is limited to the current narrow Reference Build 0.1 schema, the namespace lab is not a product privileged executor, and the recovery proof does not establish production crash/power-loss safety. Specified capabilities must not be interpreted as current repository functionality.
+These capabilities remain planned or later-milestone work. The local journal is not Everkeep integration, the preview risk model is limited to the current narrow Reference Build 0.1 schema, the namespace adapter implements only its explicitly bounded operations, and the recovery proof does not establish production crash/power-loss safety. Specified capabilities must not be interpreted as current repository functionality.

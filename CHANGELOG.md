@@ -12,5 +12,8 @@ This repository changelog records source-level development milestones. The canon
 - Added sensitive-field refusal for journal persistence and restrictive POSIX journal permissions.
 - Added fail-closed interrupted-transaction recovery that accepts only exact desired/previous revisions and preserves corrupt or third-state evidence.
 - Added deterministic privacy-safe configuration previews, bounded risk classification, exact previous/desired review tokens, and stale-review refusal before apply.
-- Added a development-only Reference Build 0.1 Linux network-namespace lab scaffold with routed-connectivity smoke testing, host-default-route invariance, and verified teardown requirements.
-- Expanded automated Milestone 0 validation to cover preview/review consistency, lab-plan safety, and the isolated namespace smoke test in CI.
+- Added a Development-only Reference Build 0.1 Linux network-namespace lab scaffold with routed-connectivity smoke testing, host-default-route invariance, and verified teardown requirements.
+- Added a bounded Development `LinuxNamespaceExecutionAdapter` restricted to dedicated adapter namespaces and explicit interface allowlists.
+- Added complete privileged-plan preflight, structured-argv static LAN configuration, namespace-scoped IPv4 forwarding, absolute tool resolution, and fail-closed refusal for unimplemented backend kinds.
+- Added adapter unit coverage and an isolated root CI smoke test that observes static LAN/forwarding state and requires host-route invariance plus namespace teardown.
+- Kept the adapter outside the product transaction runtime; WAN DHCP, nftables/NAT, LAN DHCP, management execution, and production privilege/recovery acceptance remain unresolved.
