@@ -11,4 +11,6 @@ This repository changelog records source-level development milestones. The canon
 - Added an optional atomic, integrity-checked local transaction journal for prepared/applied/retained/rolled-back phase evidence.
 - Added sensitive-field refusal for journal persistence and restrictive POSIX journal permissions.
 - Added fail-closed interrupted-transaction recovery that accepts only exact desired/previous revisions and preserves corrupt or third-state evidence.
-- Expanded automated Milestone 0 tests to cover journal persistence, integrity failure, privacy refusal, and interrupted recovery behavior.
+- Added deterministic privacy-safe configuration previews, bounded risk classification, exact previous/desired review tokens, and stale-review refusal before apply.
+- Added a development-only Reference Build 0.1 Linux network-namespace lab scaffold with routed-connectivity smoke testing, host-default-route invariance, and verified teardown requirements.
+- Expanded automated Milestone 0 validation to cover preview/review consistency, lab-plan safety, and the isolated namespace smoke test in CI.
