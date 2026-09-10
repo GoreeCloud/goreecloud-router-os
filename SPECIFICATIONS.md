@@ -25,10 +25,12 @@ The repository currently implements only an **unprivileged architecture prototyp
 2. Cross-field validation for interface identity, subnets, management exposure, forwarding intent, and DHCP scope.
 3. Canonical normalization and SHA-256 revision identity.
 4. Deterministic compilation to an abstract execution plan.
-5. In-memory transactional apply, verify, retain, and rollback behavior.
-6. Optional atomic local transaction journaling for prepared/applied/terminal phase transitions.
-7. Fail-closed interrupted-operation reconciliation against exact previous and desired revisions.
-8. Tests that prove the current validation, transaction, journal-integrity, and recovery semantics.
+5. Deterministic privacy-safe change preview with bounded risk classification for the current Reference Build 0.1 schema.
+6. Review/apply consistency binding the preview to the exact previous and desired revisions before the reviewed orchestration path delegates to apply.
+7. In-memory transactional apply, verify, retain, and rollback behavior.
+8. Optional atomic local transaction journaling for prepared/applied/terminal phase transitions.
+9. Fail-closed interrupted-operation reconciliation against exact previous and desired revisions.
+10. Tests that prove the current validation, preview, review/apply, transaction, journal-integrity, and recovery semantics.
 
 No prototype action executes `nft`, `ip`, `tc`, `sysctl`, `hostapd`, DHCP daemons, WireGuard, FRRouting, Suricata, or another privileged system command.
 
@@ -49,9 +51,9 @@ The intended lifecycle remains:
 
 `Draft → Validate → Preview → Apply → Verify → Retain or Roll Back`
 
-The current prototype implements Validate, Preview, Apply, Verify, Retain, and Roll Back only against an in-memory adapter. When journaling is enabled, the proof writes prepared and applied phase state before final retention/rollback cleanup so interrupted operations can be reconciled without assuming success.
+The Milestone 0 preview now produces bounded semantic change descriptions, an overall risk level, a connectivity-confirmation indicator for high/critical changes, and an approval token derived from the exact previous/desired revision pair and preview content. The reviewed transaction path recomputes that preview immediately before apply and refuses a stale candidate or stale previous state before runtime mutation.
 
-Privileged Linux adapters are future work and require separate safety review and acceptance.
+Apply, verify, retain, rollback, journaling, and interrupted recovery still operate only against an in-memory adapter. Privileged Linux adapters are future work and require separate safety review and acceptance.
 
 ## Recovery proof boundary
 
@@ -60,6 +62,12 @@ The Milestone 0 journal is a local development mechanism, not an Everkeep implem
 Recovery accepts an exact previous revision as evidence that no candidate apply remains active, or an exact desired revision as evidence that the candidate state is already observed. A corrupt journal or a runtime state matching neither exact revision is preserved and surfaced as `RecoveryRequired`; the prototype does not overwrite an unknown third state automatically.
 
 This behavior proves process-level decision semantics only. It does not establish real filesystem power-loss guarantees, kernel/network-daemon rollback, hardware recovery, production secret handling, or accepted Everkeep recovery.
+
+## Preview proof boundary
+
+The current preview intentionally summarizes only known fields from the narrow Reference Build 0.1 model. It does not echo raw configuration values or unknown fields into its report, so secret-like extension values are not surfaced by the preview. Its risk levels are development classifications, not Wardveil Security findings or production safety certification.
+
+A high or critical preview merely indicates that the later product should require stronger confirmation/recovery behavior; it does not prove that a real network lockout can already be detected or recovered from.
 
 ## Canonical authority
 

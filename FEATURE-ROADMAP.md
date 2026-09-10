@@ -6,6 +6,7 @@ Status values in this file describe repository work, not product release accepta
 | --- | --- | --- | --- | --- |
 | P0 | Milestone 0 configuration/state model | Development | Prototype implemented | Unit tests included |
 | P0 | Deterministic configuration compiler | Development | Abstract-plan prototype implemented | Unit tests included |
+| P0 | Safe configuration preview and review/apply consistency | Development | Privacy-safe deterministic preview and exact previous/desired review token implemented | Automated preview/risk/stale-review tests included; production management-lockout recovery not verified |
 | P0 | Transactional apply/verify/rollback | Development | Prototype includes atomic local journal and interrupted-state reconciliation | Automated rollback/journal/recovery tests included; production recovery not verified |
 | P0 | Repository governance baseline | Development | Implemented on `main` | PR #1 CI passed and merged |
 | P0 | Reference Build 0.1 virtual network lab | Planned | Not implemented | Not verified |
