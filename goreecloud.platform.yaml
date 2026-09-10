@@ -29,21 +29,28 @@ platform_systems:
     evidence:
       - PRIVACY POLICY.md
       - SECURITY.md
-    notes: The prototype is local-only and privacy-minimized, but accepted Privacy Shield authorization and runtime privacy evidence are not established.
+      - prototype/routeros_m0/journal.py
+      - prototype/routeros_m0/recovery.py
+      - tests/test_routeros_m0.py
+    notes: The prototype is local-only and privacy-minimized. The Milestone 0 journal refuses defined sensitive fields and preserves ambiguous recovery evidence locally, but accepted Privacy Shield authorization, data-classification coverage, retention policy, and runtime privacy evidence are not established.
   wardveil_security:
     result: applicable-blocked
     version: null
     evidence:
       - SECURITY.md
+      - prototype/routeros_m0/journal.py
+      - prototype/routeros_m0/recovery.py
       - tests/test_routeros_m0.py
-    notes: Prototype validation and rollback invariants exist, but accepted Wardveil Security integration and production protection evidence are not established.
+    notes: Prototype validation, rollback, journal-integrity checks, and fail-closed third-state recovery behavior exist, but accepted Wardveil Security integration and production protection evidence are not established.
   everkeep:
     result: applicable-blocked
     version: null
     evidence:
       - prototype/routeros_m0/transaction.py
+      - prototype/routeros_m0/journal.py
+      - prototype/routeros_m0/recovery.py
       - tests/test_routeros_m0.py
-    notes: In-memory known-good rollback is implemented only as a Milestone 0 proof; durable Everkeep snapshots, restore, migration, and recovery acceptance are not established.
+    notes: An atomic local journal and exact-state interrupted-transaction reconciliation are implemented only as a Milestone 0 proof. This is not Everkeep integration; durable protected snapshots, secret-safe restore, migration, power-loss acceptance, and Everkeep recovery acceptance are not established.
   glaze_ui:
     result: applicable-blocked
     version: null
@@ -76,11 +83,13 @@ continuity:
     requirements:
       - Define durable Router OS configuration snapshot scope and retention under Everkeep and Privacy Shield authority.
       - Preserve the previous known-good configuration before high-risk apply operations.
+      - Keep production secrets outside ordinary journal/export material unless an approved protected format explicitly authorizes them.
   restore:
     required: true
     requirements:
       - Validate configuration compatibility and schema before restore.
       - Verify runtime state after restore and fail closed when verification cannot prove success.
+      - Preserve recovery evidence when observed state is neither the exact desired nor previous accepted revision.
   export:
     required: true
     requirements:
@@ -120,6 +129,8 @@ conformance:
     - prototype/routeros_m0/validator.py
     - prototype/routeros_m0/compiler.py
     - prototype/routeros_m0/transaction.py
+    - prototype/routeros_m0/journal.py
+    - prototype/routeros_m0/recovery.py
     - tests/test_routeros_m0.py
   blockers:
     - Reference Build 0.1 privileged Linux networking backends are not implemented or accepted.
@@ -127,7 +138,7 @@ conformance:
     - Glaze UI administration surface is not implemented or accepted.
     - Privacy Shield integration and runtime acceptance are not established.
     - Wardveil Security integration and runtime acceptance are not established.
-    - Everkeep durable recovery integration and acceptance are not established.
+    - Everkeep durable recovery integration and acceptance are not established; the local Milestone 0 journal is only a development proof.
     - GoreeCloud Mesh, Manager, and Identity platform integration acceptance are not established.
     - Virtual-machine routing, firewall, NAT, DHCP, rollback, recovery, and management-safety acceptance is outstanding.
     - Production signing, update, release, hardware qualification, and deployment acceptance are outstanding.
