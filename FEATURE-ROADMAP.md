@@ -9,7 +9,7 @@ Status values in this file describe repository work, not product release accepta
 | P0 | Safe configuration preview and review/apply consistency | Development | Privacy-safe deterministic preview and exact previous/desired review token implemented | PR #5 CI passed with 32 tests and reference-config validation; production management-lockout recovery not verified |
 | P0 | Transactional apply/verify/rollback | Development | Prototype includes atomic local journal and interrupted-state reconciliation | Automated rollback/journal/recovery tests included; production recovery not verified |
 | P0 | Repository governance baseline | Development | Implemented on `main` | PR #1 CI passed and merged |
-| P0 | Reference Build 0.1 virtual network lab | Development | Isolated Linux namespace/veth topology scaffold and routed smoke test implemented | CI namespace smoke test required; product routing/firewall/NAT/DHCP acceptance remains unverified |
+| P0 | Reference Build 0.1 virtual network lab | Development | Isolated Linux namespace/veth topology scaffold and routed smoke test implemented | PR #6 CI passed: 38 unit tests, reference-config validation, routed ping with 0% packet loss, host default route unchanged, and generated namespaces removed; product routing/firewall/NAT/DHCP acceptance remains unverified |
 | P0 | Privileged Linux execution adapter | Planned | Not implemented | Not verified |
 | P0 | nftables firewall/NAT backend | Planned | Not implemented | Not verified |
 | P0 | LAN DHCP backend | Planned | Not implemented | Not verified |
@@ -27,6 +27,6 @@ Status values in this file describe repository work, not product release accepta
 
 Reference Build 0.1 must remain a development artifact until routing, firewall, NAT, DHCP, configuration transaction, rollback, recovery, and management-safety behavior pass applicable automated and virtual-machine acceptance tests.
 
-The virtual network lab is only the acceptance substrate. Its existence must not be treated as implementation evidence for the still-planned Router OS privileged execution, firewall/NAT, DHCP, or management API backends.
+The virtual network lab is only the acceptance substrate. Its verified smoke test must not be treated as implementation evidence for the still-planned Router OS privileged execution, firewall/NAT, DHCP, or management API backends.
 
 The corresponding central GoreeCloud feature-roadmap document must remain synchronized with this repository file when this roadmap materially changes.
