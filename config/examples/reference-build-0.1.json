@@ -1,0 +1,35 @@
+{
+  "schema_version": "0.1",
+  "profile": "reference-build-0.1",
+  "interfaces": [
+    {
+      "name": "wan0",
+      "role": "wan",
+      "mode": "dhcp",
+      "address": null,
+      "dhcp": null
+    },
+    {
+      "name": "lan0",
+      "role": "lan",
+      "mode": "static",
+      "address": "192.168.50.1/24",
+      "dhcp": {
+        "start": "192.168.50.100",
+        "end": "192.168.50.199",
+        "lease_seconds": 43200
+      }
+    }
+  ],
+  "ipv4_forwarding": true,
+  "firewall": {
+    "default_input": "drop",
+    "default_forward": "drop",
+    "allow_established": true,
+    "allow_lan_to_wan": true
+  },
+  "management": {
+    "bind_role": "lan",
+    "authenticated": true
+  }
+}
