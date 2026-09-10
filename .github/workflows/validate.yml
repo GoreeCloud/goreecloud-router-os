@@ -22,3 +22,5 @@ jobs:
         run: python scripts/validate_config.py config/examples/reference-build-0.1.json --check-only
       - name: Reference Build 0.1 virtual network lab
         run: sudo "$(command -v python)" lab/reference_build_0_1.py --run
+      - name: Privileged Linux namespace adapter smoke test
+        run: sudo "$(command -v python)" lab/privileged_adapter_smoke.py --run
