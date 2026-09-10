@@ -6,9 +6,9 @@ The current repository is a Development / Milestone 0 prototype. It is not a pro
 
 ## Current trust boundary
 
-The **product prototype** performs local parsing, validation, hashing, abstract plan generation, privacy-safe preview/review checks, in-memory transaction simulation, and optional local transaction journaling. Product-prototype code does not execute privileged system commands or modify network state.
+The configuration/transaction core performs local parsing, validation, hashing, abstract plan generation, privacy-safe preview/review checks, in-memory transaction simulation, and optional local transaction journaling. That core does not execute privileged system commands or modify network state.
 
-A separate **development-only virtual network lab** uses privileged Linux namespace operations on an ephemeral CI runner. The lab creates only generated network namespaces and veth pairs, applies addresses/routes inside those namespaces, enables IPv4 forwarding only inside the router namespace, performs a routed ping smoke test, and tears the namespaces down. This privilege must not be treated as a Router OS runtime privilege boundary or as evidence that a production privileged execution adapter exists.
+Separate Development-only privileged code exists for isolated CI acceptance. The virtual network lab creates temporary namespaces/veths and proves routed topology/teardown. The bounded `LinuxNamespaceExecutionAdapter` targets only dedicated `gcr-a-<digits>` namespaces and explicit allowlisted interfaces and currently executes only static LAN address/link state plus namespace-scoped IPv4 forwarding. Neither component is a production Router OS privilege boundary.
 
 The journal is intentionally restricted to the current secret-free prototype configuration. It is not a credential store, Everkeep implementation, or security attestation mechanism.
 
@@ -25,23 +25,26 @@ The journal is intentionally restricted to the current secret-free prototype con
 - Journal persistence rejects defined sensitive field names and uses restrictive POSIX permissions.
 - Journal reads fail closed on malformed content, unexpected fields, digest mismatches, or checksum mismatches.
 - Interrupted recovery automatically accepts only exact previous/desired revisions; unknown third states are not overwritten.
-- Virtual-lab route modifications must target named namespaces; host-route commands are rejected by plan tests.
-- The virtual lab snapshots the host default route and fails if it changes during the run.
-- Virtual-lab teardown verifies that generated namespaces are removed.
+- Virtual-lab route modifications target named namespaces and the lab verifies host-route invariance and teardown.
+- Privileged-adapter namespaces must match `gcr-a-<digits>` and interfaces must be explicitly allowlisted with safe Linux-length names.
+- The adapter preflights the entire plan before root checks, target probes, or mutation; unsupported operations therefore cannot produce partial execution.
+- The adapter accepts no arbitrary shell command, interpreter, sysctl, route operation, or host namespace target.
+- Privileged commands use structured argv and resolved absolute `ip`/`sysctl` paths.
+- The complete Reference Build plan remains unexecutable because WAN DHCP, DHCP service, firewall/NAT, and management backends are absent.
 
 The journal checksum is unkeyed and should be understood as corruption/consistency detection, not protection against an attacker who can rewrite both content and checksum.
 
-## Virtual lab boundary
+## Privileged Development boundary
 
-The namespace lab is intentionally a test harness. It does not execute a Router OS nftables policy, NAT backend, DHCP backend, management API, Wi-Fi control path, VPN path, or platform integration. Its temporary WAN address is fixed test plumbing and does not satisfy the Reference Build 0.1 DHCP-WAN requirement.
+The adapter smoke test creates a disposable namespace and dummy interface on an ephemeral GitHub-hosted runner, applies only the accepted static-LAN and forwarding subset, observes resulting state, removes the namespace, and checks that the host default route did not change.
 
-The CI workflow grants elevated privileges only to the reviewed lab script on the disposable hosted runner. The workflow retains `contents: read` permissions and does not require repository secrets for the lab.
+Repository workflow permissions remain `contents: read` and the smoke path does not require repository secrets. Running with root inside a disposable CI runner proves only the reviewed namespace behavior; it does not prove production capability isolation, daemon privilege separation, seccomp/capability policy, physical interface ownership, or hardened service design.
 
 ## Future privileged implementation requirements
 
-A future Router OS runtime must use structured privileged operations, least privilege, fail-closed validation, atomic or compensating application where physical atomicity is unavailable, observed-state verification, protected recovery, and evidence-backed security status. Raw user-controlled shell execution must not become the normal configuration path.
+The next product backends must retain structured operations, least privilege, fail-closed validation, atomic or compensating application where physical atomicity is unavailable, observed-state verification, protected recovery, and evidence-backed status. Raw user-controlled shell execution must not become the normal configuration path.
 
-Durable production recovery must use an approved protected storage and recovery design, including secret separation and the applicable Everkeep/Privacy Shield contracts, before it can replace this prototype journal.
+The namespace adapter must not be connected to full transaction apply until each required backend has defined observation and rollback/recovery semantics. Durable production recovery must use an approved protected storage and recovery design, including secret separation and the applicable Everkeep/Privacy Shield contracts, before it can replace the prototype journal.
 
 ## Vulnerability reporting
 

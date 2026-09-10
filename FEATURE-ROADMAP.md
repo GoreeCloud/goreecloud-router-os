@@ -10,7 +10,7 @@ Status values in this file describe repository work, not product release accepta
 | P0 | Transactional apply/verify/rollback | Development | Prototype includes atomic local journal and interrupted-state reconciliation | Automated rollback/journal/recovery tests included; production recovery not verified |
 | P0 | Repository governance baseline | Development | Implemented on `main` | PR #1 CI passed and merged |
 | P0 | Reference Build 0.1 virtual network lab | Development | Isolated Linux namespace/veth topology scaffold and routed smoke test implemented | PR #6 CI passed: 38 unit tests, reference-config validation, routed ping with 0% packet loss, host default route unchanged, and generated namespaces removed; product routing/firewall/NAT/DHCP acceptance remains unverified |
-| P0 | Privileged Linux execution adapter | Planned | Not implemented | Not verified |
+| P0 | Privileged Linux execution adapter | Development | Namespace-only adapter implements complete preflight, allowlisted static-LAN execution, and namespace-scoped IPv4 forwarding; full Reference Build plan fails closed while required backends are absent | Exact-head unit and isolated privileged smoke validation required before acceptance; production privilege model not verified |
 | P0 | nftables firewall/NAT backend | Planned | Not implemented | Not verified |
 | P0 | LAN DHCP backend | Planned | Not implemented | Not verified |
 | P0 | Local authenticated management API | Planned | Not implemented | Not verified |
@@ -27,6 +27,6 @@ Status values in this file describe repository work, not product release accepta
 
 Reference Build 0.1 must remain a development artifact until routing, firewall, NAT, DHCP, configuration transaction, rollback, recovery, and management-safety behavior pass applicable automated and virtual-machine acceptance tests.
 
-The virtual network lab is only the acceptance substrate. Its verified smoke test must not be treated as implementation evidence for the still-planned Router OS privileged execution, firewall/NAT, DHCP, or management API backends.
+The privileged adapter remains deliberately incomplete. It may execute only its accepted namespace-scoped static-LAN and IPv4-forwarding subset. The complete compiled Reference Build plan must continue to fail closed until WAN DHCP, firewall/NAT, LAN DHCP, and management operations have accepted backends and observed-state/recovery behavior.
 
 The corresponding central GoreeCloud feature-roadmap document must remain synchronized with this repository file when this roadmap materially changes.

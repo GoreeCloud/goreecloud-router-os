@@ -17,9 +17,9 @@ The first executable reference build is intended for a narrow x86-64 virtual-rou
 
 Wi-Fi, multi-WAN, IDS/IPS, dynamic routing, extension installation, high availability, arbitrary consumer-router support, and production remote administration are outside Reference Build 0.1 unless separately approved.
 
-## Current product-source scope
+## Current configuration and transaction scope
 
-The repository currently implements only an **unprivileged Router OS architecture prototype**:
+The repository currently implements a Development Router OS architecture core for:
 
 1. Candidate configuration parsing.
 2. Cross-field validation for interface identity, subnets, management exposure, forwarding intent, and DHCP scope.
@@ -30,20 +30,13 @@ The repository currently implements only an **unprivileged Router OS architectur
 7. In-memory transactional apply, verify, retain, and rollback behavior.
 8. Optional atomic local transaction journaling for prepared/applied/terminal phase transitions.
 9. Fail-closed interrupted-operation reconciliation against exact previous and desired revisions.
-10. Tests that prove the current validation, preview, review/apply, transaction, journal-integrity, recovery, and lab-plan safety semantics.
+10. Tests that prove the current validation, preview, review/apply, transaction, journal-integrity, recovery, lab, and adapter safety semantics.
 
-No **product prototype** action executes `nft`, `ip`, `tc`, `sysctl`, `hostapd`, DHCP daemons, WireGuard, FRRouting, Suricata, or another privileged system command. A separate development test harness is described below and must not be confused with the product runtime.
+The transaction core still uses `InMemoryRuntime` and does not invoke the privileged namespace adapter.
 
 ## State model
 
-The engineering architecture distinguishes:
-
-- Candidate state: proposed configuration submitted for validation.
-- Desired state: validated configuration accepted as intended target state.
-- Applied state: configuration a runtime adapter reports as applied.
-- Observed state: independently read runtime state used for verification.
-
-The prototype preserves that distinction and does not equate intent with successful runtime application.
+The engineering architecture distinguishes candidate, desired, applied, and observed state. The prototype preserves that distinction and does not equate intent with successful runtime application.
 
 ## Safe configuration lifecycle
 
@@ -53,7 +46,7 @@ The intended lifecycle remains:
 
 The Milestone 0 preview produces bounded semantic change descriptions, an overall risk level, a connectivity-confirmation indicator for high/critical changes, and an approval token derived from the exact previous/desired revision pair and preview content. The reviewed transaction path recomputes that preview immediately before apply and refuses a stale candidate or stale previous state before runtime mutation.
 
-Apply, verify, retain, rollback, journaling, and interrupted recovery still operate only against an in-memory product adapter. Privileged Linux Router OS adapters are future work and require separate safety review and acceptance.
+Apply, verify, retain, rollback, journaling, and interrupted recovery still operate against the in-memory transaction adapter. Real privileged transactional integration requires separate backend-specific snapshot, observation, rollback/compensation, and recovery acceptance.
 
 ## Recovery proof boundary
 
@@ -71,11 +64,17 @@ A high or critical preview merely indicates that the later product should requir
 
 ## Virtual network lab boundary
 
-The repository includes a development-only Reference Build 0.1 Linux network-namespace lab. The initial harness creates three generated namespaces representing upstream, router, and LAN client; connects them with two veth pairs; uses documentation-only WAN test addressing plus the current development LAN subnet; enables IPv4 forwarding inside the router namespace; verifies routed ping connectivity; compares the host default route before and after execution; and verifies namespace teardown.
+The repository includes a Development-only Reference Build 0.1 Linux network-namespace lab. It creates generated upstream/router/LAN-client namespaces, connects them with veth pairs, enables IPv4 forwarding inside the router namespace, verifies routed ping connectivity, compares the host default route before and after execution, and verifies namespace teardown.
 
-The lab runs with elevated privileges on an ephemeral GitHub-hosted CI runner because Linux namespace creation requires them. Those privileges belong to the isolated test harness, not the Router OS product runtime. The lab command plan accepts no caller-supplied shell fragments, and all route additions target explicit namespaces rather than the host routing table.
+The lab runs with elevated privileges on an ephemeral GitHub-hosted CI runner because Linux namespace creation requires them. Those privileges belong to the isolated test harness, not a production Router OS runtime.
 
-The initial namespace lab is an acceptance substrate only. Its temporary static WAN plumbing does not satisfy the Reference Build 0.1 DHCP-WAN requirement, and it does not implement or verify the planned Router OS privileged execution adapter, nftables firewall/NAT backend, LAN DHCP backend, authenticated management API, management-lockout recovery, or platform-system integrations.
+## Privileged Linux adapter boundary
+
+The repository now contains a separate `LinuxNamespaceExecutionAdapter` Development substrate. It accepts only dedicated `gcr-a-<digits>` namespaces, requires an explicit interface allowlist, preflights the complete plan before target probes or mutation, requires root only after successful plan validation, resolves absolute Linux tool paths, and executes structured argv without shell interpretation.
+
+The accepted operation subset is limited to static IPv4 LAN address/link configuration and `net.ipv4.ip_forward` inside the approved namespace. The complete compiler output is intentionally rejected because WAN DHCP, `dhcp.intent`, `firewall.intent`, and `management.intent` remain unsupported.
+
+This adapter is not integrated with `apply_transaction`, is not a host-network or physical-router executor, and does not establish production least privilege, rollback, nftables/NAT, DHCP, management safety, platform-system integration, or hardware acceptance.
 
 ## Canonical authority
 
