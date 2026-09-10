@@ -20,3 +20,5 @@ jobs:
         run: python -m unittest discover -s tests -v
       - name: Validate reference configuration
         run: python scripts/validate_config.py config/examples/reference-build-0.1.json --check-only
+      - name: Reference Build 0.1 virtual network lab
+        run: sudo "$(command -v python)" lab/reference_build_0_1.py --run
