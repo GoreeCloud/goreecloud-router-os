@@ -27,4 +27,34 @@ The prototype serializes normalized configuration with stable key ordering and c
 
 `transaction.py` snapshots the prior known-good state, applies the desired state to an in-memory runtime, observes the result, and retains only when observed and desired revision identities match. Verification mismatch restores the previous snapshot.
 
-This proves the control-flow contract only. It does not prove filesystem crash consistency, daemon restart behavior, kernel networking atomicity, hardware behavior, or power-loss recovery.
+When an `AtomicJournalStore` is supplied, the transaction records a prepared phase before apply, an applied phase after the runtime reports apply completion, and a terminal retained/rolled-back phase before cleanup. Normal terminal transactions clear the journal after the runtime state is confirmed.
+
+## Atomic journal proof
+
+`journal.py` implements a deliberately narrow development journal for the current secret-free Reference Build 0.1 configuration. It:
+
+- normalizes desired and previous configurations and records their revision digests;
+- refuses defined sensitive field names rather than silently persisting them;
+- serializes one versioned JSON envelope with a SHA-256 consistency checksum;
+- writes through a temporary file, flushes and fsyncs it, atomically replaces the target, and fsyncs the parent directory where supported;
+- applies a `0600` file mode on POSIX systems;
+- rejects unknown journal fields, invalid phases, digest mismatches, malformed JSON, and checksum mismatches.
+
+The checksum is not keyed and therefore is not a substitute for authenticated storage or adversarial tamper protection.
+
+## Interrupted-operation recovery
+
+`recovery.py` reads the journal and compares observed runtime state with the exact previous and desired revision identities. Automatic reconciliation is intentionally limited:
+
+- **Prepared + previous observed**: discard the unapplied journal.
+- **Prepared + desired observed**: finalize the desired state as retained.
+- **Applied + desired observed**: finalize the desired state as retained.
+- **Applied + previous observed**: confirm rollback.
+- **Terminal phase + matching runtime**: clear the stale terminal journal.
+- **Corrupt journal or third runtime state**: preserve evidence and raise `RecoveryRequired` instead of overwriting an unknown state.
+
+This fail-closed behavior is a proof of recovery decision semantics. It does not yet restore real Linux networking state, survive verified power-loss fault injection, or integrate with Everkeep.
+
+## Current limitation
+
+The prototype still uses only an in-memory runtime adapter. It does not prove daemon restart behavior, kernel networking atomicity, hardware behavior, production filesystem crash consistency, or power-loss recovery. Those remain required acceptance work before a privileged backend or Reference Build 0.1 can be treated as production-capable.

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any, Mapping
 
 from .compiler import compile_plan
+from .journal import AtomicJournalStore, JournalRecord
 from .model import ConfigRevision
 from .validator import validate_config
 
@@ -48,21 +49,57 @@ class InMemoryRuntime:
         self._applied = deepcopy(snapshot) if snapshot is not None else None
 
 
-def apply_transaction(config: Mapping[str, Any], runtime: InMemoryRuntime) -> TransactionResult:
+def _digest(config: Mapping[str, Any] | None) -> str | None:
+    return ConfigRevision.from_config(config).digest if config is not None else None
+
+
+def apply_transaction(
+    config: Mapping[str, Any],
+    runtime: InMemoryRuntime,
+    *,
+    journal_store: AtomicJournalStore | None = None,
+) -> TransactionResult:
+    """Validate, apply, verify, and retain or roll back a candidate config.
+
+    When a journal store is supplied, phase transitions are written atomically
+    before and after the in-memory apply so a later process can reconcile an
+    interrupted transaction without guessing.
+    """
     validate_config(config)
     desired = ConfigRevision.from_config(config)
     plan = compile_plan(desired.normalized)
     previous = runtime.snapshot()
+    previous_digest = _digest(previous)
+    record = JournalRecord.prepare(desired.normalized, previous) if journal_store is not None else None
 
-    runtime.apply(desired.normalized, plan)
-    applied = ConfigRevision.from_config(runtime.snapshot()).digest if runtime.snapshot() is not None else None
+    if journal_store is not None and record is not None:
+        journal_store.write(record)
+
+    try:
+        runtime.apply(desired.normalized, plan)
+    except Exception:
+        runtime.restore(previous)
+        if journal_store is not None and record is not None:
+            journal_store.write(record.with_phase("rolled_back"))
+            if _digest(runtime.snapshot()) == previous_digest:
+                journal_store.clear()
+        raise
+
+    applied_snapshot = runtime.snapshot()
+    applied = _digest(applied_snapshot)
+    if journal_store is not None and record is not None:
+        journal_store.write(record.with_phase("applied"))
+
     observed_state = runtime.observe()
-    observed = ConfigRevision.from_config(observed_state).digest if observed_state is not None else None
+    observed = _digest(observed_state)
 
     if observed != desired.digest:
         runtime.restore(previous)
-        restored = runtime.snapshot()
-        restored_digest = ConfigRevision.from_config(restored).digest if restored is not None else None
+        restored_digest = _digest(runtime.snapshot())
+        if journal_store is not None and record is not None:
+            journal_store.write(record.with_phase("rolled_back"))
+            if restored_digest == previous_digest:
+                journal_store.clear()
         return TransactionResult(
             retained=False,
             rolled_back=True,
@@ -71,6 +108,10 @@ def apply_transaction(config: Mapping[str, Any], runtime: InMemoryRuntime) -> Tr
             observed_revision=observed,
             reason="verification failed; previous state restored",
         )
+
+    if journal_store is not None and record is not None:
+        journal_store.write(record.with_phase("retained"))
+        journal_store.clear()
 
     return TransactionResult(
         retained=True,
