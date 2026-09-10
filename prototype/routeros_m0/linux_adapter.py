@@ -43,14 +43,14 @@ class ExecutionResult:
 
 
 Runner = Callable[..., subprocess.CompletedProcess[str]]
-_NAMESPACE_RE = re.compile(r"^gcr-[a-z0-9][a-z0-9-]*$")
+_NAMESPACE_RE = re.compile(r"^gcr-a-[0-9]+$")
 _INTERFACE_RE = re.compile(r"^[A-Za-z0-9_.-]+$")
 _REVISION_RE = re.compile(r"^[0-9a-f]{64}$")
 
 
 def _validate_namespace(value: str) -> str:
     if not isinstance(value, str) or not _NAMESPACE_RE.fullmatch(value):
-        raise TargetValidationError("execution namespace must be a generated gcr-* namespace")
+        raise TargetValidationError("execution namespace must use the generated gcr-a-<digits> form")
     if len(value.encode("utf-8")) > 48:
         raise TargetValidationError("execution namespace name is too long")
     return value
@@ -79,10 +79,10 @@ def _normalize_ipv4_interface(value: str) -> str:
 class LinuxNamespaceExecutionAdapter:
     """Execute a deliberately tiny set of Router OS operations in one lab namespace.
 
-    This Development adapter is not a host-network executor. It accepts only generated
-    ``gcr-*`` namespaces and an explicit interface allowlist. Complete plan preflight
-    happens before target probes or mutation so an unsupported operation fails closed.
-    Commands are always structured argv; shell execution is never used.
+    This Development adapter is not a host-network executor. It accepts only dedicated
+    ``gcr-a-<digits>`` namespaces and an explicit interface allowlist. Complete plan
+    preflight happens before target probes or mutation so an unsupported operation
+    fails closed. Commands are always structured argv; shell execution is never used.
     """
 
     def __init__(
@@ -238,7 +238,7 @@ class LinuxNamespaceExecutionAdapter:
         if not materialized or materialized[0] != "ip":
             raise AdapterError("rendered command must use the ip entrypoint")
         materialized[0] = ip_path
-        if len(materialized) >= 5 and materialized[1:4] == ["netns", "exec", materialized[3]]:
+        if len(materialized) >= 5 and materialized[1:3] == ["netns", "exec"]:
             if materialized[4] != "sysctl":
                 raise AdapterError("namespace execution may invoke only the approved sysctl backend")
             materialized[4] = sysctl_path
