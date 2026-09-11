@@ -115,8 +115,7 @@ compatibility:
     - goreecloud-router-os-config/0.1-prototype
 
 evidence:
-  acceptance_tests:
-    - tests/test_routeros_m0.py
+  acceptance_tests: []
   release: []
 
 conformance:
