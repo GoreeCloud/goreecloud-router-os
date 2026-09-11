@@ -56,7 +56,7 @@ platform_systems:
     version: null
     evidence:
       - README.md
-    notes: A Glaze UI administration surface is specified for Reference Build 0.1 but no accepted UI implementation exists in this repository.
+    notes: GLAZE UI V1.3 / 1.3.0 is the current required Stable consumer target for the specified administration surface, but no accepted Router OS UI implementation or rendered/accessibility evidence exists in this repository.
   mesh:
     result: applicable-blocked
     version: null
@@ -107,9 +107,10 @@ external_dependencies:
 
 compatibility:
   platform_contract: "0.2"
-  glaze_ui_required: null
+  glaze_ui_required: "1.3.0"
   requires:
     - goreecloud-platform-contract==0.2
+    - goreecloud-glaze-ui==1.3.0
   provides:
     - goreecloud-router-os-config/0.1-prototype
 
