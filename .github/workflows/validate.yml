@@ -11,9 +11,20 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      CANDIDATE_REVISION: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || github.sha }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout exact candidate
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          ref: ${{ env.CANDIDATE_REVISION }}
+          persist-credentials: false
+      - name: Verify exact candidate revision
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_REVISION"
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: "3.12"
       - name: Unit tests
@@ -24,3 +35,9 @@ jobs:
         run: sudo "$(command -v python)" lab/reference_build_0_1.py --run
       - name: Privileged Linux namespace adapter smoke test
         run: sudo "$(command -v python)" lab/privileged_adapter_smoke.py --run
+
+  platform-contract:
+    name: Validate exact GoreeCloud Platform Contract
+    uses: GoreeCloud/GoreeCloud/.github/workflows/reusable-platform-manifest.yml@235e519fe342d7e7075c8239fbf0f3a19dc4c6c8
+    with:
+      manifest-path: goreecloud.platform.yaml
