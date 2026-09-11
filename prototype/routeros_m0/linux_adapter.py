@@ -8,6 +8,8 @@ import shutil
 import subprocess
 from typing import Any, Callable, Mapping, Sequence
 
+from .nftables_backend import FILTER_TABLE, NAT_TABLE, NftablesBackendError, compile_firewall_intent
+
 
 class AdapterError(RuntimeError):
     """Base error for the Development-only privileged Linux adapter."""
@@ -25,6 +27,8 @@ class UnsupportedOperation(AdapterError):
 class RenderedCommand:
     kind: str
     argv: tuple[str, ...]
+    stdin: str | None = None
+    check: bool = True
 
 
 @dataclass(frozen=True)
@@ -77,7 +81,7 @@ def _normalize_ipv4_interface(value: str) -> str:
 
 
 class LinuxNamespaceExecutionAdapter:
-    """Execute a deliberately tiny set of Router OS operations in one lab namespace.
+    """Execute a deliberately bounded set of Router OS operations in one lab namespace.
 
     This Development adapter is not a host-network executor. It accepts only dedicated
     ``gcr-a-<digits>`` namespaces and an explicit interface allowlist. Complete plan
@@ -128,6 +132,10 @@ class LinuxNamespaceExecutionAdapter:
                 required_interfaces.append(interface)
             elif kind == "sysctl.intent":
                 rendered.append(self._render_sysctl(operation))
+            elif kind == "firewall.intent":
+                commands, interfaces = self._render_firewall(operation)
+                rendered.extend(commands)
+                required_interfaces.extend(interfaces)
             else:
                 raise UnsupportedOperation(f"no accepted privileged backend for operation kind: {kind!r}")
 
@@ -186,6 +194,46 @@ class LinuxNamespaceExecutionAdapter:
             ),
         )
 
+    def _render_firewall(
+        self,
+        operation: Mapping[str, Any],
+    ) -> tuple[tuple[RenderedCommand, ...], tuple[str, str]]:
+        try:
+            ruleset = compile_firewall_intent(operation)
+        except NftablesBackendError as exc:
+            raise UnsupportedOperation(str(exc)) from exc
+
+        for interface in (ruleset.lan_interface, ruleset.wan_interface):
+            if interface not in self.allowed_interfaces:
+                raise TargetValidationError("firewall interface is outside the adapter allowlist")
+
+        nft_base = ("ip", "netns", "exec", self.namespace, "nft")
+        return (
+            (
+                RenderedCommand(
+                    kind="nftables.stage.filter_table",
+                    argv=nft_base + ("add", "table", "inet", FILTER_TABLE),
+                    check=False,
+                ),
+                RenderedCommand(
+                    kind="nftables.stage.nat_table",
+                    argv=nft_base + ("add", "table", "ip", NAT_TABLE),
+                    check=False,
+                ),
+                RenderedCommand(
+                    kind="nftables.check",
+                    argv=nft_base + ("--check", "-f", "-"),
+                    stdin=ruleset.script,
+                ),
+                RenderedCommand(
+                    kind="nftables.apply",
+                    argv=nft_base + ("-f", "-"),
+                    stdin=ruleset.script,
+                ),
+            ),
+            (ruleset.lan_interface, ruleset.wan_interface),
+        )
+
     def execute(self, plan: Mapping[str, Any]) -> ExecutionResult:
         """Execute a completely preflighted plan inside the approved namespace."""
         prepared = self.preflight(plan)
@@ -195,7 +243,9 @@ class LinuxNamespaceExecutionAdapter:
 
         ip_path = shutil.which("ip")
         sysctl_path = shutil.which("sysctl")
-        if not ip_path or not sysctl_path:
+        needs_nft = any("nft" in command.argv for command in prepared.commands)
+        nft_path = shutil.which("nft") if needs_nft else None
+        if not ip_path or not sysctl_path or (needs_nft and not nft_path):
             raise TargetValidationError("required Linux networking tools are unavailable")
 
         self._verify_namespace(ip_path)
@@ -203,8 +253,13 @@ class LinuxNamespaceExecutionAdapter:
             self._verify_interface(ip_path, interface)
 
         for command in prepared.commands:
-            argv = self._materialize(command.argv, ip_path=ip_path, sysctl_path=sysctl_path)
-            self._run(argv)
+            argv = self._materialize(
+                command.argv,
+                ip_path=ip_path,
+                sysctl_path=sysctl_path,
+                nft_path=nft_path,
+            )
+            self._run(argv, check=command.check, input_text=command.stdin)
 
         return ExecutionResult(
             namespace=prepared.namespace,
@@ -233,15 +288,22 @@ class LinuxNamespaceExecutionAdapter:
         *,
         ip_path: str,
         sysctl_path: str,
+        nft_path: str | None = None,
     ) -> tuple[str, ...]:
         materialized = list(argv)
         if not materialized or materialized[0] != "ip":
             raise AdapterError("rendered command must use the ip entrypoint")
         materialized[0] = ip_path
         if len(materialized) >= 5 and materialized[1:3] == ["netns", "exec"]:
-            if materialized[4] != "sysctl":
-                raise AdapterError("namespace execution may invoke only the approved sysctl backend")
-            materialized[4] = sysctl_path
+            backend = materialized[4]
+            if backend == "sysctl":
+                materialized[4] = sysctl_path
+            elif backend == "nft":
+                if not nft_path:
+                    raise AdapterError("nftables backend path is unavailable")
+                materialized[4] = nft_path
+            else:
+                raise AdapterError("namespace execution may invoke only approved backends")
         return tuple(materialized)
 
     def _run(
@@ -250,11 +312,14 @@ class LinuxNamespaceExecutionAdapter:
         *,
         check: bool = True,
         capture: bool = False,
+        input_text: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
-        return self._runner(
-            list(argv),
-            check=check,
-            text=True,
-            stdout=subprocess.PIPE if capture else subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
-        )
+        kwargs: dict[str, Any] = {
+            "check": check,
+            "text": True,
+            "stdout": subprocess.PIPE if capture else subprocess.DEVNULL,
+            "stderr": subprocess.PIPE,
+        }
+        if input_text is not None:
+            kwargs["input"] = input_text
+        return self._runner(list(argv), **kwargs)
