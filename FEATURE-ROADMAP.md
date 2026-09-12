@@ -14,6 +14,7 @@ Status values in this file describe repository work, not product release accepta
 | P0 | nftables firewall/NAT backend | Planned | Not implemented | Not verified |
 | P0 | LAN DHCP backend | Planned | Not implemented | Not verified |
 | P0 | Local authenticated management API | Planned | Not implemented | Not verified |
+| P1 | Multi-environment deployment portability and installation profiles | Planned | Deployment portability contract defined for Proxmox VM, generic VM, Docker, Podman, GoreeCloud Containers, bare metal, and additional qualified targets; install artifacts/adapters are not implemented | No install profile is accepted yet; each claimed profile must pass the shared capability, network-safety, routing/firewall/NAT/DHCP, transaction/recovery, upgrade/rollback, backup/restore/migration, diagnostics, performance, and platform-conformance matrix |
 | P1 | Minimal Glaze UI administration surface | Planned | Not implemented | Not verified |
 | P1 | Everkeep-backed durable snapshots/recovery | Planned | Local journal/recovery proof only; Everkeep not integrated | Not accepted or production-verified |
 | P1 | Privacy Shield authorization/retention enforcement | Planned | Not implemented | Not verified |
@@ -28,5 +29,7 @@ Status values in this file describe repository work, not product release accepta
 Reference Build 0.1 must remain a development artifact until routing, firewall, NAT, DHCP, configuration transaction, rollback, recovery, and management-safety behavior pass applicable automated and virtual-machine acceptance tests.
 
 The privileged adapter remains deliberately incomplete. It may execute only its accepted namespace-scoped static-LAN and IPv4-forwarding subset. The complete compiled Reference Build plan must continue to fail closed until WAN DHCP, firewall/NAT, LAN DHCP, and management operations have accepted backends and observed-state/recovery behavior.
+
+Deployment method must not create divergent Router OS products. Docker, Podman, GoreeCloud Containers, Proxmox VM, generic VM, bare-metal, cloud, system-container, and later qualified targets must reuse the canonical configuration/state/API/administration/recovery contracts. A target may be advertised as Supported only after its required environment capabilities and shared cross-environment acceptance suite pass. Missing required kernel/networking/storage/security capabilities must fail closed rather than silently downgrade Router OS behavior.
 
 The corresponding central GoreeCloud feature-roadmap document must remain synchronized with this repository file when this roadmap materially changes.
