@@ -76,6 +76,28 @@ The accepted operation subset is limited to static IPv4 LAN address/link configu
 
 This adapter is not integrated with `apply_transaction`, is not a host-network or physical-router executor, and does not establish production least privilege, rollback, nftables/NAT, DHCP, management safety, platform-system integration, or hardware acceptance.
 
+## Deployment portability and installation profiles
+
+GoreeCloud Router OS must use one canonical product/configuration contract across supported installation environments. Packaging, device attachment, privilege plumbing, service supervision, and host integration may differ by environment, but supported Router OS configuration semantics, API behavior, administration, security/privacy boundaries, backup/recovery meaning, and supported networking behavior must not fork by installation method.
+
+The required deployment families include Proxmox VE virtual machines, generic KVM/QEMU virtual machines, Docker, Podman, GoreeCloud Containers through the GoreeCloud Container Engine, and bare-metal x86-64 appliances. Additional cloud-VM, system-container, hypervisor, architecture, and hardware targets may be added through the same qualification process.
+
+Docker, Podman, and GoreeCloud Containers should consume the same OCI Router OS artifact where practical. A full-router OCI profile must explicitly declare and verify required Linux capabilities, network namespaces/interfaces, sysctls, devices, mounts, persistent storage, and security-module constraints. It must not use unrestricted `--privileged` operation as the normal product contract merely for convenience. If the runtime cannot provide a capability required by the selected Router OS configuration, startup must fail closed with a specific diagnostic instead of silently weakening or disabling required networking/security behavior.
+
+The canonical GoreeCloud platform name is **GoreeCloud Containers** and the backend component is **GoreeCloud Container Engine**. Router OS must integrate through accepted Container Engine capabilities/contracts rather than depending on undocumented implementation internals. The GoreeCloud Containers installation profile remains Planned until that project separately proves the runtime, networking, privilege, storage, and recovery capabilities Router OS requires.
+
+Proxmox support must be implemented through ordinary open VM/network primitives rather than a proprietary Router OS fork. Generic KVM/QEMU compatibility should remain aligned with the same virtual-hardware assumptions where practical.
+
+Supported deployment adapters must map canonical WAN/LAN/VLAN roles to environment mechanisms such as physical NICs, virtio NICs, TAP devices, Linux bridges, veth pairs, VLAN trunks, macvlan/ipvlan where appropriate, or runtime-provided OCI network attachments. Logical interface intent must never be treated as proof that the observed attachment exists or is healthy.
+
+Important Router OS state must live on explicit durable storage. Disposable container writable layers must never become the only copy of canonical configuration, transaction/recovery data, keys or secret references, update state, or other required durable state. Backup/export and restore/import should be portable across installation profiles where hardware-specific bindings do not prevent it, and migration must re-run capability detection and environment binding.
+
+A deployment target is not Supported merely because the process starts. Each claimed profile must pass the applicable shared acceptance suite for install/start, capability detection, interface binding, routing/forwarding, firewall/NAT, DHCP where applicable, management access and lockout recovery, transaction/rollback/restart/crash recovery, upgrade/rollback, backup/restore/migration, Privacy Shield-safe diagnostics, host-safety invariants, performance/resource behavior, and required GoreeCloud platform-system conformance.
+
+The target is deployment-method transparency for ordinary administration: once a profile is implemented and accepted, users should receive the same supported Router OS product concepts and behavior regardless of whether it runs in Docker, Podman, GoreeCloud Containers, Proxmox, another accepted VM, bare metal, or another qualified environment.
+
+The detailed Development architecture contract is maintained in `docs/architecture/DEPLOYMENT-PORTABILITY.md`. None of these installation profiles is currently accepted or released; the existing namespace lab and bounded privileged adapter remain development/acceptance substrates only.
+
 ## Canonical authority
 
 The controlling product specification is the canonical Drive document. This repository file must remain consistent with it but does not replace it.
