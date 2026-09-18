@@ -73,6 +73,18 @@ Before any flash or partition write:
 
 Sensitive identifiers such as device-unique MAC addresses, serial numbers, credentials, keys, and tokens must not be committed to the public repository.
 
+The repository now includes `scripts/collect_gl_mt5000_hardware.sh`, a non-mutating POSIX-shell collector intended for this phase. It reads an allowlisted set of board, CPU, device-tree, block-device, interface, watchdog, thermal, GPIO-controller, kernel-module, and tool-presence sources. It deliberately does not read interface MAC-address attributes, CPU serial values, UCI configuration, credentials, packet data, or boot-environment contents.
+
+On a Brume 3 running vendor firmware, the intended invocation is:
+
+```sh
+sh scripts/collect_gl_mt5000_hardware.sh > gl-mt5000-discovery.txt
+```
+
+The resulting report must be reviewed locally before retention. Repository-side validation uses `prototype/routeros_m0/hardware_discovery.py`, which rejects reports containing MAC addresses, serial-number values, credential-like fields, a missing privacy boundary, or missing non-mutation assertions.
+
+The collector writes only to stdout. Redirecting stdout to a report file is an operator-selected local file write; the collector itself does not change router configuration, boot state, storage layout, firmware, firewall state, or network state.
+
 ### Phase 2 — Recovery proof
 
 Before a GoreeCloud image may write internal storage:
@@ -148,14 +160,17 @@ The GL-MT5000 may move toward Supported only after device-level evidence covers 
 
 ## Current implementation slice
 
-The first repository slice adds:
+The current repository slice adds:
 
 - `hardware/profiles/glinet-gl-mt5000.json` with vendor-primary facts and explicit unknowns;
 - `prototype/routeros_m0/hardware_profile.py` with fail-closed profile validation and readiness assessment;
-- `tests/test_hardware_profile.py` with Development-state, architecture, resource, port-identity, and installability safety tests.
+- `tests/test_hardware_profile.py` with Development-state, architecture, resource, port-identity, and installability safety tests;
+- `scripts/collect_gl_mt5000_hardware.sh` with an allowlisted non-mutating discovery path designed for stock vendor firmware;
+- `prototype/routeros_m0/hardware_discovery.py` with privacy/status validation for retained discovery evidence;
+- `tests/test_gl_mt5000_discovery.py` with fixture-based collection, privacy rejection, non-mutation boundary, and forbidden-command source tests.
 
 This slice does not modify hardware, build a kernel, produce an image, or install Router OS.
 
 ## Next engineering gate
 
-The next useful step is a **read-only Brume 3 hardware-discovery collector and evidence schema** designed to run on the vendor firmware without changing network, boot, or storage state. Its output should be sanitized before any repository retention.
+Run the collector on an actual Brume 3 while it remains on vendor firmware, review the report locally for privacy, validate it with the repository parser, and use the resulting direct-observation evidence to resolve only the hardware-profile fields actually demonstrated. Physical port mapping, boot/recovery behavior, and any action that could change eMMC or boot state remain separate controlled tests.
