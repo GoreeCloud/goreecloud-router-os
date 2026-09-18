@@ -1,0 +1,92 @@
+{
+  "profile_version": "0.1",
+  "profile_id": "glinet-gl-mt5000",
+  "vendor": "GL.iNet",
+  "model": "GL-MT5000",
+  "product_name": "Brume 3",
+  "architecture": "aarch64",
+  "lifecycle": {
+    "status": "development",
+    "installable": false,
+    "supported": false,
+    "hardware_verified": false,
+    "qualification_target": "first-wave ARM64 wired appliance candidate"
+  },
+  "resources": {
+    "cpu": {
+      "vendor_description": "MediaTek quad-core Cortex-A53",
+      "cores": 4,
+      "max_frequency_mhz": 2000
+    },
+    "memory_type": "DDR4",
+    "memory_vendor_capacity": "1 GB"
+  },
+  "ethernet": {
+    "port_count": 3,
+    "ports": [
+      {
+        "label": "WAN 2.5G",
+        "max_speed_mbps": 2500,
+        "kernel_name": null,
+        "observed_on_target": false
+      },
+      {
+        "label": "LAN 1 2.5G",
+        "max_speed_mbps": 2500,
+        "kernel_name": null,
+        "observed_on_target": false
+      },
+      {
+        "label": "LAN 2 2.5G",
+        "max_speed_mbps": 2500,
+        "kernel_name": null,
+        "observed_on_target": false
+      }
+    ],
+    "vendor_role_note": "Vendor documentation describes one WAN and two LAN ports; current product material also describes one LAN port as WAN/LAN switchable for dual-WAN operation."
+  },
+  "storage": {
+    "type": "eMMC",
+    "vendor_capacity": "8 GB",
+    "partition_map_verified": false
+  },
+  "platform": {
+    "usb": "1 x USB 3.0",
+    "power": "USB-C, 5V/3A",
+    "reset_button": true,
+    "vendor_firmware_family": "OpenWrt 21.02",
+    "vendor_kernel": "5.4.281",
+    "boot_chain_verified": false,
+    "recovery_path_verified": false,
+    "device_tree_verified": false,
+    "kernel_support_verified": false,
+    "watchdog_verified": false,
+    "thermal_monitoring_verified": false
+  },
+  "evidence": [
+    {
+      "class": "vendor-primary",
+      "url": "https://www.gl-inet.com/products/gl-mt5000/",
+      "supports": "CPU class and frequency, memory/storage capacity, three 2.5GbE ports, USB 3.0, power, and vendor firmware family."
+    },
+    {
+      "class": "vendor-primary",
+      "url": "https://docs.gl-inet.com/router/en/4/user_guide/gl-mt5000/",
+      "supports": "Brume 3 model identity, Cortex-A53 CPU family, 1 GB RAM, 8 GB eMMC, and OpenWrt 21.02 vendor software baseline."
+    }
+  ],
+  "unknowns": [
+    "Exact MediaTek SoC identifier from an accepted primary hardware source.",
+    "Boot ROM and bootloader chain, signing behavior, and writable boot-environment boundaries.",
+    "Factory and failsafe recovery mechanisms suitable for a GoreeCloud image.",
+    "Authoritative eMMC partition table and boot-critical partition ownership.",
+    "Linux device-tree compatibility and board identifier for the selected GoreeCloud kernel.",
+    "Linux interface names and physical-port-to-netdev mapping.",
+    "Ethernet MAC/PHY/switch topology and hardware offload behavior.",
+    "Reset-button GPIO and any additional LED/GPIO mappings.",
+    "Hardware watchdog availability and reset semantics.",
+    "Thermal sensor exposure and safe operating thresholds.",
+    "Upstream/mainline kernel support level for all required board peripherals.",
+    "Safe installation and rollback procedure that preserves a recoverable vendor or GoreeCloud boot path."
+  ]
+}
