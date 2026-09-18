@@ -41,6 +41,7 @@ The full namespace and privileged-adapter smoke tests require Linux network-name
 - `config/` — versioned schema and sanitized examples.
 - `hardware/profiles/` — Development hardware-profile manifests; a profile is not evidence of installability or support.
 - `scripts/collect_gl_mt5000_hardware.sh` — GL-MT5000 non-mutating stock-firmware discovery collector.
+- `scripts/validate_gl_mt5000_discovery.py` — workstation-side privacy/status validator and direct-observation summarizer.
 - `tests/` — unit tests for invariants, preview/review consistency, rollback, journal integrity, recovery, lab-plan safety, privileged-adapter safety, and hardware-profile status integrity.
 - `docs/architecture/` — repository-local engineering detail.
 - `docs/hardware/` — hardware-specific qualification records and safety gates.
