@@ -17,3 +17,6 @@ This repository changelog records source-level development milestones. The canon
 - Added complete privileged-plan preflight, structured-argv static LAN configuration, namespace-scoped IPv4 forwarding, absolute tool resolution, and fail-closed refusal for unimplemented backend kinds.
 - Added adapter unit coverage and an isolated root CI smoke test that observes static LAN/forwarding state and requires host-route invariance plus namespace teardown.
 - Kept the adapter outside the product transaction runtime; WAN DHCP, nftables/NAT, LAN DHCP, management execution, and production privilege/recovery acceptance remain unresolved.
+- Added the first GL.iNet Brume 3 (GL-MT5000) ARM64 Development hardware profile using vendor-primary evidence and explicit unresolved board bindings.
+- Added fail-closed hardware-profile validation/readiness checks and unit coverage that prevent an unverified target from being represented as installable or Supported.
+- Added the Brume 3 qualification sequence for non-destructive discovery, recovery proof, kernel/board enablement, storage/update design, runtime binding, and physical acceptance; no firmware image or device mutation is included.
