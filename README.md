@@ -12,6 +12,8 @@ The complete Reference Build 0.1 compiled plan is intentionally refused before m
 
 The canonical product specification is maintained in GoreeCloud Google Drive as `GoreeCloud/Projects/Project Specification — Router OS.docx`. Repository-local specifications are version-coupled development records and must not override authoritative GoreeCloud governance.
 
+A Development hardware profile now exists for the GL.iNet Brume 3 (GL-MT5000) as an ARM64 wired-appliance qualification candidate. The profile is deliberately non-installable and non-Supported until board-specific boot, recovery, storage, device-tree, Ethernet, watchdog, thermal, and physical acceptance evidence exists.
+
 ## Milestone 0 prototype
 
 The prototype models the narrow Reference Build 0.1 target defined by the canonical specification: one DHCP WAN, one static LAN, IPv4 forwarding intent, LAN DHCP intent, stateful-firewall intent, and safe preview/apply/verify/rollback behavior. The compiler emits a structured abstract product execution plan.
@@ -37,8 +39,10 @@ The full namespace and privileged-adapter smoke tests require Linux network-name
 - `prototype/routeros_m0/` — Milestone 0 configuration/transaction/recovery proof plus the bounded namespace adapter.
 - `lab/` — Development-only isolated Reference Build 0.1 network and adapter acceptance harnesses.
 - `config/` — versioned schema and sanitized examples.
-- `tests/` — unit tests for invariants, preview/review consistency, rollback, journal integrity, recovery, lab-plan safety, and privileged-adapter safety.
+- `hardware/profiles/` — Development hardware-profile manifests; a profile is not evidence of installability or support.
+- `tests/` — unit tests for invariants, preview/review consistency, rollback, journal integrity, recovery, lab-plan safety, privileged-adapter safety, and hardware-profile status integrity.
 - `docs/architecture/` — repository-local engineering detail.
+- `docs/hardware/` — hardware-specific qualification records and safety gates.
 - `.github/workflows/` — automated validation for the current prototype and isolated privileged test harnesses.
 
 ## Governance and status
