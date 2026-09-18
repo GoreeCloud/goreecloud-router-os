@@ -41,6 +41,19 @@ class Brume3HardwareProfileTests(unittest.TestCase):
             )
         )
 
+    def test_source_reported_recovery_and_upstream_proposal_do_not_promote_state(self):
+        profile = load_hardware_profile(PROFILE_PATH)
+        self.assertIn("U-Boot", profile["source_reported"]["recovery"]["method"])
+        self.assertIn(
+            "closed unmerged",
+            profile["source_reported"]["openwrt_submission"]["status"],
+        )
+        self.assertFalse(profile["platform"]["recovery_path_verified"])
+        self.assertFalse(profile["platform"]["kernel_support_verified"])
+        self.assertFalse(profile["lifecycle"]["hardware_verified"])
+        self.assertFalse(profile["lifecycle"]["installable"])
+        self.assertFalse(profile["lifecycle"]["supported"])
+
     def test_readiness_fails_closed_on_unverified_board_bindings(self):
         readiness = assess_hardware_readiness(
             load_hardware_profile(PROFILE_PATH)
