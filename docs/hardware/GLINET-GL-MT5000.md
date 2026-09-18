@@ -38,6 +38,28 @@ Primary vendor sources:
 
 The machine-readable profile preserves these as vendor-primary evidence and deliberately keeps unverified board-specific bindings separate.
 
+## Source-reported engineering evidence
+
+Additional primary/vendor-authored material is useful for planning but does not yet count as GoreeCloud direct hardware verification.
+
+GL.iNet's current debrick documentation explicitly includes the GL-MT5000 in its U-Boot Web UI recovery procedure. For Brume 3, GL.iNet documents the Power LED flashing blue seven times and then turning solid white as the model-specific entry indication before the recovery Web UI flow.
+
+A separate GLiNet-Tech-authored OpenWrt submission, OpenWrt PR #21728, reported:
+
+- MediaTek MT7987A SoC;
+- two 2.5GbE LAN paths behind a Realtek RTL8366ub switch;
+- one 2.5GbE path using the SoC internal PHY;
+- UART at 115200 8n1;
+- an eMMC/GPT layout containing u-boot-env, Factory, fip, cfg, log, kernel, and rootfs regions;
+- an OpenWrt sysupgrade path from the vendor firmware.
+
+That OpenWrt pull request was **closed without merge**. It is therefore recorded as vendor-authored implementation evidence, not accepted upstream support. The Router OS profile keeps kernel support, device-tree support, recovery acceptance, storage layout, interface mapping, and hardware verification false until direct or otherwise accepted evidence satisfies those gates.
+
+Primary evidence:
+
+- https://docs.gl-inet.com/router/en/4/faq/debrick/
+- https://github.com/openwrt/openwrt/pull/21728
+
 ## Fail-closed profile contract
 
 The hardware-profile validator refuses to treat a physical appliance as installable until evidence exists for the board-specific properties that can brick, strand, or misroute the device.
@@ -82,6 +104,14 @@ sh scripts/collect_gl_mt5000_hardware.sh > gl-mt5000-discovery.txt
 ```
 
 The resulting report must be reviewed locally before retention. Repository-side validation uses `prototype/routeros_m0/hardware_discovery.py`, which rejects reports containing MAC addresses, serial-number values, credential-like fields, a missing privacy boundary, or missing non-mutation assertions.
+
+After local review, validate and summarize the report from a workstation checkout:
+
+```sh
+python scripts/validate_gl_mt5000_discovery.py gl-mt5000-discovery.txt > gl-mt5000-observations.json
+```
+
+The validator emits only a privacy-safe direct-observation summary and explicitly keeps `installable=false` and `supported=false`. Evidence extraction never promotes lifecycle state automatically.
 
 The collector writes only to stdout. Redirecting stdout to a report file is an operator-selected local file write; the collector itself does not change router configuration, boot state, storage layout, firmware, firewall state, or network state.
 
@@ -166,8 +196,9 @@ The current repository slice adds:
 - `prototype/routeros_m0/hardware_profile.py` with fail-closed profile validation and readiness assessment;
 - `tests/test_hardware_profile.py` with Development-state, architecture, resource, port-identity, and installability safety tests;
 - `scripts/collect_gl_mt5000_hardware.sh` with an allowlisted non-mutating discovery path designed for stock vendor firmware;
-- `prototype/routeros_m0/hardware_discovery.py` with privacy/status validation for retained discovery evidence;
-- `tests/test_gl_mt5000_discovery.py` with fixture-based collection, privacy rejection, non-mutation boundary, and forbidden-command source tests.
+- `prototype/routeros_m0/hardware_discovery.py` with privacy/status validation and direct-observation extraction for retained discovery evidence;
+- `scripts/validate_gl_mt5000_discovery.py` with a workstation-side validated evidence-summary CLI;
+- `tests/test_gl_mt5000_discovery.py` with fixture-based collection, privacy rejection, non-mutation boundary, evidence-summary, and forbidden-command source tests.
 
 This slice does not modify hardware, build a kernel, produce an image, or install Router OS.
 
