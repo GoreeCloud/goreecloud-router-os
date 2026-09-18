@@ -48,6 +48,9 @@ The namespace lab and privileged adapter are Development infrastructure, not a d
 - Fail-closed hardware-profile validation that prevents `installable=true` without direct target-hardware verification.
 - Readiness assessment that blocks physical installation while Ethernet bindings, eMMC partitioning, boot/recovery, device-tree, kernel, watchdog, thermal, or other recorded hardware unknowns remain unresolved.
 - Unit tests covering lifecycle truthfulness, architecture constraints, resource/port invariants, duplicate-port refusal, and the future fully verified transition.
+- Non-mutating GL-MT5000 POSIX-shell discovery collector that emits privacy-minimized board, CPU, device-tree, storage, interface, watchdog, thermal, GPIO-controller, kernel-module, and safe tool-presence evidence to stdout.
+- Discovery-report parser that requires the GL-MT5000 profile identity, privacy boundary, and explicit non-mutation assertions and rejects MAC addresses, serial-number values, and credential-like content.
+- Fixture-based tests proving CPU serial and interface MAC values are excluded and scanning the collector source for prohibited network, boot, storage, firmware, service, and power-state mutation commands.
 
 The GL-MT5000 profile is Development qualification infrastructure only. It does not provide a kernel, bootloader integration, installer, system image, device-tree acceptance, physical network execution, or hardware support claim.
 
