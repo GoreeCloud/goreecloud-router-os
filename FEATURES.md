@@ -41,6 +41,16 @@
 
 The namespace lab and privileged adapter are Development infrastructure, not a deployable Router OS runtime. The adapter is not wired into product transaction apply/rollback, and the temporary lab WAN plumbing does not implement the specified DHCP-WAN backend.
 
+## Implemented Development hardware-profile infrastructure
+
+- Machine-readable GL.iNet Brume 3 (GL-MT5000) ARM64 Development profile using vendor-primary evidence for the bounded resource and port baseline.
+- Explicit separation of vendor-reported facts from GoreeCloud direct observation and test evidence.
+- Fail-closed hardware-profile validation that prevents `installable=true` without direct target-hardware verification.
+- Readiness assessment that blocks physical installation while Ethernet bindings, eMMC partitioning, boot/recovery, device-tree, kernel, watchdog, thermal, or other recorded hardware unknowns remain unresolved.
+- Unit tests covering lifecycle truthfulness, architecture constraints, resource/port invariants, duplicate-port refusal, and the future fully verified transition.
+
+The GL-MT5000 profile is Development qualification infrastructure only. It does not provide a kernel, bootloader integration, installer, system image, device-tree acceptance, physical network execution, or hardware support claim.
+
 ## Specified but not implemented
 
 The canonical specification defines production routing, nftables-backed firewalling, NAT, VLANs, device inventory and quarantine, WAN/multi-WAN, Wi-Fi and travel-router functions, GoreeCloud Network/Conduit integration, VPN interoperability, Beacon integration, DHCP/IPv6, SQM, traffic visibility, IDS/IPS, Wardveil Security, Privacy Shield, Everkeep, Glaze UI administration, diagnostics, extensions, API/CLI, secure updates, hardware support, high availability, and multi-environment deployment portability.
