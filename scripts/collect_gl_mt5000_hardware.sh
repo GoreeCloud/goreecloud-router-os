@@ -213,7 +213,7 @@ emit_file "kernel.modules" "proc/modules"
 
 if [ "$ROOT" = "/" ]; then
   section "tools.available"
-  for tool in nft ip bridge ethtool ubus jsonfilter block fw_printenv fw_setenv sysupgrade; do
+  for tool in nft ip bridge ethtool ubus jsonfilter block fw_printenv; do
     if command -v "$tool" >/dev/null 2>&1; then
       printf '%s=present\n' "$tool"
     else
