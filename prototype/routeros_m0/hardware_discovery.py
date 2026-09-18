@@ -89,3 +89,62 @@ def report_has_hardware_identity(report: DiscoveryReport) -> bool:
     """Return true when the report includes both model and board-name evidence."""
     present = set(report.sections)
     return "board.model" in present and "board.name" in present
+
+
+@dataclass(frozen=True)
+class GLMT5000Observations:
+    model: str | None
+    board_name: str | None
+    devicetree_model: str | None
+    compatibles: tuple[str, ...]
+    interfaces: tuple[str, ...]
+    block_devices: tuple[str, ...]
+    watchdogs: tuple[str, ...]
+    thermal_zones: tuple[str, ...]
+
+
+def section_lines(report: DiscoveryReport, name: str) -> tuple[str, ...]:
+    """Return non-empty payload lines from one named report section."""
+    active: str | None = None
+    values: list[str] = []
+    for raw_line in report.text.splitlines():
+        line = raw_line.rstrip("\n")
+        stripped = line.strip()
+        if stripped.startswith("[") and stripped.endswith("]") and len(stripped) > 2:
+            active = stripped[1:-1]
+            continue
+        if active == name and stripped:
+            values.append(stripped)
+    return tuple(values)
+
+
+def _first_section_value(report: DiscoveryReport, name: str) -> str | None:
+    values = section_lines(report, name)
+    return values[0] if values else None
+
+
+def _prefixed_values(report: DiscoveryReport, name: str, prefix: str) -> tuple[str, ...]:
+    values: list[str] = []
+    for line in section_lines(report, name):
+        if line.startswith(prefix):
+            value = line[len(prefix):].strip()
+            if value:
+                values.append(value)
+    return tuple(values)
+
+
+def extract_gl_mt5000_observations(report: DiscoveryReport) -> GLMT5000Observations:
+    """Extract privacy-safe direct observations without promoting support state."""
+    if report.profile_id != "glinet-gl-mt5000":
+        raise DiscoveryReportError("observation extractor requires the GL-MT5000 profile")
+
+    return GLMT5000Observations(
+        model=_first_section_value(report, "board.model"),
+        board_name=_first_section_value(report, "board.name"),
+        devicetree_model=_first_section_value(report, "devicetree.model"),
+        compatibles=section_lines(report, "devicetree.compatible"),
+        interfaces=_prefixed_values(report, "network.interfaces", "interface="),
+        block_devices=_prefixed_values(report, "storage.sysfs", "device="),
+        watchdogs=_prefixed_values(report, "watchdog", "watchdog="),
+        thermal_zones=_prefixed_values(report, "thermal", "zone="),
+    )
