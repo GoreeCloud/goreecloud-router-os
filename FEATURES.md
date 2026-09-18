@@ -50,7 +50,10 @@ The namespace lab and privileged adapter are Development infrastructure, not a d
 - Unit tests covering lifecycle truthfulness, architecture constraints, resource/port invariants, duplicate-port refusal, and the future fully verified transition.
 - Non-mutating GL-MT5000 POSIX-shell discovery collector that emits privacy-minimized board, CPU, device-tree, storage, interface, watchdog, thermal, GPIO-controller, kernel-module, and safe tool-presence evidence to stdout.
 - Discovery-report parser that requires the GL-MT5000 profile identity, privacy boundary, and explicit non-mutation assertions and rejects MAC addresses, serial-number values, and credential-like content.
-- Fixture-based tests proving CPU serial and interface MAC values are excluded and scanning the collector source for prohibited network, boot, storage, firmware, service, and power-state mutation commands.
+- Privacy-safe direct-observation extraction for model/board identity, device-tree compatible strings, interfaces, block devices, watchdogs, and thermal zones without promoting hardware lifecycle state.
+- Workstation-side discovery validator CLI that emits a structured direct-observation JSON summary with `installable=false` and `supported=false`.
+- Fixture-based tests proving CPU serial and interface MAC values are excluded, validating safe evidence summaries, and scanning the collector source for prohibited network, boot, storage, firmware, service, and power-state mutation commands.
+- Source-reported Brume 3 engineering evidence is recorded separately from verified state: GL.iNet documents a U-Boot recovery flow, while GLiNet-Tech's MT7987A/RTL8366ub OpenWrt submission was closed unmerged and does not establish accepted upstream support.
 
 The GL-MT5000 profile is Development qualification infrastructure only. It does not provide a kernel, bootloader integration, installer, system image, device-tree acceptance, physical network execution, or hardware support claim.
 
