@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 from pathlib import Path
+import json
 import stat
 import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -14,6 +16,7 @@ from prototype.routeros_m0.hardware_discovery import (
 
 ROOT = Path(__file__).resolve().parents[1]
 COLLECTOR = ROOT / "scripts/collect_gl_mt5000_hardware.sh"
+VALIDATOR = ROOT / "scripts/validate_gl_mt5000_discovery.py"
 
 
 def write(root: Path, relative: str, content: str | bytes) -> None:
@@ -124,6 +127,33 @@ class GLMT5000DiscoveryTests(unittest.TestCase):
         self.assertNotIn("0123456789abcdef", text)
         self.assertNotIn("aa:bb:cc:dd:ee:ff", text)
         self.assertNotIn("Serial", text)
+
+    def test_validator_cli_emits_safe_direct_observation_summary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            fixture = Path(tmp) / "fixture"
+            fixture.mkdir()
+            self.fixture_root(fixture)
+            report_path = Path(tmp) / "report.txt"
+            report_path.write_text(self.run_collector(fixture), encoding="utf-8")
+            result = subprocess.run(
+                [sys.executable, str(VALIDATOR), str(report_path)],
+                check=True,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=ROOT,
+            )
+        payload = json.loads(result.stdout)
+        self.assertEqual(payload["profile_id"], "glinet-gl-mt5000")
+        self.assertEqual(payload["classification"], "direct-observation")
+        self.assertTrue(payload["hardware_identity_present"])
+        self.assertEqual(payload["observations"]["model"], "GL.iNet GL-MT5000")
+        self.assertIn("eth0", payload["observations"]["interfaces"])
+        self.assertIn("mmcblk0", payload["observations"]["block_devices"])
+        self.assertFalse(payload["status"]["installable"])
+        self.assertFalse(payload["status"]["supported"])
+        self.assertNotIn("aa:bb:cc:dd:ee:ff", result.stdout)
+        self.assertNotIn("0123456789abcdef", result.stdout)
 
     def test_report_records_non_mutating_boundary(self):
         with tempfile.TemporaryDirectory() as tmp:
