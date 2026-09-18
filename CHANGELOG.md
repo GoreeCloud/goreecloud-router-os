@@ -17,3 +17,10 @@ This repository changelog records source-level development milestones. The canon
 - Added complete privileged-plan preflight, structured-argv static LAN configuration, namespace-scoped IPv4 forwarding, absolute tool resolution, and fail-closed refusal for unimplemented backend kinds.
 - Added adapter unit coverage and an isolated root CI smoke test that observes static LAN/forwarding state and requires host-route invariance plus namespace teardown.
 - Kept the adapter outside the product transaction runtime; WAN DHCP, nftables/NAT, LAN DHCP, management execution, and production privilege/recovery acceptance remain unresolved.
+- Added the first GL.iNet Brume 3 (GL-MT5000) ARM64 Development hardware profile using vendor-primary evidence and explicit unresolved board bindings.
+- Added fail-closed hardware-profile validation/readiness checks and unit coverage that prevent an unverified target from being represented as installable or Supported.
+- Added the Brume 3 qualification sequence for non-destructive discovery, recovery proof, kernel/board enablement, storage/update design, runtime binding, and physical acceptance; no firmware image or device mutation is included.
+- Added a non-mutating GL-MT5000 stock-firmware discovery collector that emits an allowlisted hardware report to stdout without reading device-unique network addresses, CPU serial values, UCI configuration, credentials, or boot-environment contents.
+- Added discovery-report privacy/status validation plus fixture tests that reject MAC/serial/credential leakage and statically forbid router/network/boot/storage mutation commands in the collector.
+- Added privacy-safe direct-observation extraction and a workstation validation CLI that summarizes discovered model/device-tree/interface/storage/watchdog/thermal evidence without promoting installable or Supported state.
+- Recorded GL.iNet's vendor-documented GL-MT5000 U-Boot recovery path and GLiNet-Tech's vendor-authored MT7987A/RTL8366ub/flash-layout OpenWrt proposal as source-reported evidence while preserving false recovery/kernel/hardware verification flags; the referenced OpenWrt PR was closed unmerged.

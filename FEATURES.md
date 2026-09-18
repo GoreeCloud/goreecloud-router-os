@@ -41,6 +41,22 @@
 
 The namespace lab and privileged adapter are Development infrastructure, not a deployable Router OS runtime. The adapter is not wired into product transaction apply/rollback, and the temporary lab WAN plumbing does not implement the specified DHCP-WAN backend.
 
+## Implemented Development hardware-profile infrastructure
+
+- Machine-readable GL.iNet Brume 3 (GL-MT5000) ARM64 Development profile using vendor-primary evidence for the bounded resource and port baseline.
+- Explicit separation of vendor-reported facts from GoreeCloud direct observation and test evidence.
+- Fail-closed hardware-profile validation that prevents `installable=true` without direct target-hardware verification.
+- Readiness assessment that blocks physical installation while Ethernet bindings, eMMC partitioning, boot/recovery, device-tree, kernel, watchdog, thermal, or other recorded hardware unknowns remain unresolved.
+- Unit tests covering lifecycle truthfulness, architecture constraints, resource/port invariants, duplicate-port refusal, and the future fully verified transition.
+- Non-mutating GL-MT5000 POSIX-shell discovery collector that emits privacy-minimized board, CPU, device-tree, storage, interface, watchdog, thermal, GPIO-controller, kernel-module, and safe tool-presence evidence to stdout.
+- Discovery-report parser that requires the GL-MT5000 profile identity, privacy boundary, and explicit non-mutation assertions and rejects MAC addresses, serial-number values, and credential-like content.
+- Privacy-safe direct-observation extraction for model/board identity, device-tree compatible strings, interfaces, block devices, watchdogs, and thermal zones without promoting hardware lifecycle state.
+- Workstation-side discovery validator CLI that emits a structured direct-observation JSON summary with `installable=false` and `supported=false`.
+- Fixture-based tests proving CPU serial and interface MAC values are excluded, validating safe evidence summaries, and scanning the collector source for prohibited network, boot, storage, firmware, service, and power-state mutation commands.
+- Source-reported Brume 3 engineering evidence is recorded separately from verified state: GL.iNet documents a U-Boot recovery flow, while GLiNet-Tech's MT7987A/RTL8366ub OpenWrt submission was closed unmerged and does not establish accepted upstream support.
+
+The GL-MT5000 profile is Development qualification infrastructure only. It does not provide a kernel, bootloader integration, installer, system image, device-tree acceptance, physical network execution, or hardware support claim.
+
 ## Specified but not implemented
 
 The canonical specification defines production routing, nftables-backed firewalling, NAT, VLANs, device inventory and quarantine, WAN/multi-WAN, Wi-Fi and travel-router functions, GoreeCloud Network/Conduit integration, VPN interoperability, Beacon integration, DHCP/IPv6, SQM, traffic visibility, IDS/IPS, Wardveil Security, Privacy Shield, Everkeep, Glaze UI administration, diagnostics, extensions, API/CLI, secure updates, hardware support, high availability, and multi-environment deployment portability.

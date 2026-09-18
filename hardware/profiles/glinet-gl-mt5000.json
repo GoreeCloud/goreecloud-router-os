@@ -1,0 +1,129 @@
+{
+  "profile_version": "0.1",
+  "profile_id": "glinet-gl-mt5000",
+  "vendor": "GL.iNet",
+  "model": "GL-MT5000",
+  "product_name": "Brume 3",
+  "architecture": "aarch64",
+  "lifecycle": {
+    "status": "development",
+    "installable": false,
+    "supported": false,
+    "hardware_verified": false,
+    "qualification_target": "first-wave ARM64 wired appliance candidate"
+  },
+  "resources": {
+    "cpu": {
+      "vendor_description": "MediaTek quad-core Cortex-A53",
+      "cores": 4,
+      "max_frequency_mhz": 2000
+    },
+    "memory_type": "DDR4",
+    "memory_vendor_capacity": "1 GB"
+  },
+  "ethernet": {
+    "port_count": 3,
+    "ports": [
+      {
+        "label": "WAN 2.5G",
+        "max_speed_mbps": 2500,
+        "kernel_name": null,
+        "observed_on_target": false
+      },
+      {
+        "label": "LAN 1 2.5G",
+        "max_speed_mbps": 2500,
+        "kernel_name": null,
+        "observed_on_target": false
+      },
+      {
+        "label": "LAN 2 2.5G",
+        "max_speed_mbps": 2500,
+        "kernel_name": null,
+        "observed_on_target": false
+      }
+    ],
+    "vendor_role_note": "Vendor documentation describes one WAN and two LAN ports; current product material also describes one LAN port as WAN/LAN switchable for dual-WAN operation."
+  },
+  "storage": {
+    "type": "eMMC",
+    "vendor_capacity": "8 GB",
+    "partition_map_verified": false
+  },
+  "platform": {
+    "usb": "1 x USB 3.0",
+    "power": "USB-C, 5V/3A",
+    "reset_button": true,
+    "vendor_firmware_family": "OpenWrt 21.02",
+    "vendor_kernel": "5.4.281",
+    "boot_chain_verified": false,
+    "recovery_path_verified": false,
+    "device_tree_verified": false,
+    "kernel_support_verified": false,
+    "watchdog_verified": false,
+    "thermal_monitoring_verified": false
+  },
+  "evidence": [
+    {
+      "class": "vendor-primary",
+      "url": "https://www.gl-inet.com/products/gl-mt5000/",
+      "supports": "CPU class and frequency, memory/storage capacity, three 2.5GbE ports, USB 3.0, power, and vendor firmware family."
+    },
+    {
+      "class": "vendor-primary",
+      "url": "https://docs.gl-inet.com/router/en/4/user_guide/gl-mt5000/",
+      "supports": "Brume 3 model identity, Cortex-A53 CPU family, 1 GB RAM, 8 GB eMMC, and OpenWrt 21.02 vendor software baseline."
+    },
+    {
+      "class": "vendor-primary",
+      "url": "https://docs.gl-inet.com/router/en/4/faq/debrick/",
+      "supports": "GL.iNet documents a U-Boot Web UI recovery flow for GL-MT5000 and the model-specific LED entry sequence. GoreeCloud direct recovery verification is still required.",
+      "status": "source-reported; not directly verified by GoreeCloud"
+    },
+    {
+      "class": "vendor-primary",
+      "url": "https://github.com/openwrt/openwrt/pull/21728",
+      "supports": "GLiNet-Tech's vendor-authored OpenWrt submission reports MT7987A, RTL8366ub LAN-switch topology, UART parameters, an eMMC flash layout, and an OpenWrt sysupgrade path.",
+      "status": "closed unmerged; useful vendor implementation evidence but not accepted upstream support"
+    }
+  ],
+  "unknowns": [
+    "Direct target confirmation of the vendor-reported MediaTek MT7987A SoC identifier.",
+    "Boot ROM and bootloader chain, signing behavior, and writable boot-environment boundaries.",
+    "Direct target verification of the vendor-documented U-Boot recovery path on the actual hardware revision.",
+    "Direct target verification of the vendor-reported eMMC/GPT partition layout and boot-critical partition ownership before any write.",
+    "Linux device-tree compatibility and board identifier for the selected GoreeCloud kernel.",
+    "Linux interface names and physical-port-to-netdev mapping.",
+    "Direct target verification of the vendor-reported Realtek RTL8366ub / SoC Ethernet topology and hardware offload behavior.",
+    "Reset-button GPIO and LED/GPIO mappings.",
+    "Direct target confirmation of the vendor-reported UART and a safe console-access procedure.",
+    "Hardware watchdog availability and reset semantics.",
+    "Thermal sensor exposure and safe operating thresholds.",
+    "Accepted upstream/mainline kernel support level for all required board peripherals; the reviewed OpenWrt proposal was closed unmerged.",
+    "Safe installation and rollback procedure that preserves a recoverable vendor or GoreeCloud boot path."
+  ],
+  "source_reported": {
+    "recovery": {
+      "status": "vendor-documented; direct target verification required",
+      "method": "U-Boot Web UI failsafe",
+      "entry_behavior": "Hold Reset while powering on; GL.iNet documents the GL-MT5000 Power LED flashing blue 7 times and then turning solid white before the recovery Web UI flow."
+    },
+    "openwrt_submission": {
+      "status": "vendor-authored upstream implementation proposal; OpenWrt PR #21728 closed unmerged",
+      "soc": "MediaTek MT7987A",
+      "lan_switch": "Realtek RTL8366ub",
+      "uart": "115200 8n1 (VCC, RX, TX, GND)",
+      "flash_layout": [
+        "0x0~0x4400: GPT",
+        "0x400000~0x480000: u-boot-env",
+        "0x480000~0x880000: Factory",
+        "0x880000~0xa80000: fip",
+        "0xa80000~0xc80000: cfg",
+        "0xc80000~0xe80000: log",
+        "0xe80000~0x2e80000: kernel",
+        "0x2e80000~0x12a80000: rootfs"
+      ],
+      "installation_note": "The vendor-authored proposal describes sysupgrade from GL.iNet firmware, but this is not a GoreeCloud installation authorization and the upstream proposal was not merged."
+    }
+  }
+}

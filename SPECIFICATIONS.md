@@ -98,6 +98,16 @@ The target is deployment-method transparency for ordinary administration: once a
 
 The detailed Development architecture contract is maintained in `docs/architecture/DEPLOYMENT-PORTABILITY.md`. None of these installation profiles is currently accepted or released; the existing namespace lab and bounded privileged adapter remain development/acceptance substrates only.
 
+## GL.iNet Brume 3 Development hardware target
+
+The GL.iNet Brume 3 (GL-MT5000) is an ARM64 wired-appliance qualification candidate under the broader hardware strategy. Its repository profile records only vendor-primary baseline facts plus explicit unknowns and does not make the device installable or Supported.
+
+The hardware profile must remain fail closed until direct evidence establishes the board-specific boot/recovery chain, eMMC partition ownership, device-tree and kernel support, physical-port-to-netdev mapping, Ethernet topology/offload behavior, watchdog/reset behavior, thermal monitoring, and a safe installation/rollback path.
+
+No Brume 3 internal-storage write, partition mutation, boot-environment mutation, or support claim is authorized by the existence of the profile. Physical installation eligibility requires the applicable shared deployment acceptance matrix plus device-specific recovery and hardware acceptance evidence.
+
+Repository detail is maintained in `docs/hardware/GLINET-GL-MT5000.md` and `hardware/profiles/glinet-gl-mt5000.json`.
+
 ## Canonical authority
 
 The controlling product specification is the canonical Drive document. This repository file must remain consistent with it but does not replace it.
